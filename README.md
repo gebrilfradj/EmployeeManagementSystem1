@@ -1,50 +1,84 @@
-Welcome To My Employee/Intern management system. I created this during off/free time during my internship at ups to give my supervisor a way to keep track of all new interns that will come in and out during the next few years. During the final week of my internship, my supervisors were given this project and they have been very happy with it. 
-
 # Employee Management System
 
-## Description
-This Employee Management System is designed using ASP.NET Core and Blazor to streamline the management of employee records, including adding, editing, deleting, and viewing operations. It also features audit logging to monitor changes effectively and uses MSSQL for data management.
+A full-stack Blazor Server application for tracking employee and intern records, built with ASP.NET Core and Entity Framework Core.
+
+Originally built during downtime while interning at UPS, to give my supervisor a way to track the interns rotating through the team. It was handed over to my supervisors in my final week and has been in use since.
 
 ## Features
-- **CRUD Operations**: Create, Read, Update, and Delete employee details.
-- **Audit Logging**: Tracks changes to the employee records with detailed logs.
-- **Responsive Web Design**: Implemented using Blazor for a seamless user experience across different devices.
-- **Authentication and Authorization**: Manages access control ensuring that only authorized personnel can make changes.
 
-## Technology Stack
-- **Frontend**: Blazor Server
-- **Backend**: ASP.NET Core
-- **ORM**: Entity Framework Core
-- **Database**: Microsoft SQL Server
+- **CRUD operations** — create, read, update, and delete employee records.
+- **Audit logging** — every change to an employee record is written to an audit log, viewable in-app at `/auditlogs`.
+- **Authentication and authorization** — ASP.NET Core Identity with role support, so only authorized staff can make changes.
+- **Responsive UI** — Blazor Server components that work across desktop and mobile.
+- **Seed data** — Bogus is used to generate realistic sample employees for local development.
 
-## Getting Started
+## Technology stack
+
+| Layer    | Technology                          |
+| -------- | ----------------------------------- |
+| UI       | Blazor Server (.NET 6)              |
+| Backend  | ASP.NET Core 6                      |
+| Auth     | ASP.NET Core Identity (with roles)  |
+| ORM      | Entity Framework Core 6             |
+| Database | Microsoft SQL Server                |
+
+## Getting started
 
 ### Prerequisites
-- .NET 7
-- SQL Server
 
-### Installation
+- [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- SQL Server (LocalDB, Express, or a full instance)
 
-1. **Clone the repository:**
+### Setup
 
-2. **Navigate to the project directory:**
+1. **Clone the repository**
 
-3. **Set up the database:**
-- Make sure SQL Server is running.
-- Create a new database via SQL Server Management Studio or any preferred SQL client.
-- Update the connection string in `appsettings.json` or your environment-specific configuration to match your database credentials and server.
+   ```bash
+   git clone https://github.com/gebrilfradj/employee-management-system.git
+   cd employee-management-system
+   ```
 
-4. **Apply migrations to set up your database schema:**
+2. **Point the app at your SQL Server instance**
 
+   Edit `EmployeeManagementSystem1/appsettings.json` and replace the `DefaultConnection` string with your own server:
 
-### Running the Application
+   ```json
+   "ConnectionStrings": {
+     "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Initial Catalog=EmployeeManagementSysDb;Integrated Security=True;TrustServerCertificate=True;"
+   }
+   ```
 
-1. **Start the ASP.NET Core backend:**
+   > The database schema is created automatically on first run via `Database.EnsureCreated()` — there are no EF migrations to apply.
 
-- Ensure your backend API is configured to run on an appropriate port which is accessible by your Blazor frontend.
+3. **Restore and run**
 
-2. **Launch the Blazor App:**
+   ```bash
+   dotnet restore
+   dotnet run --project EmployeeManagementSystem1
+   ```
 
-- If using Blazor Server, the `dotnet run` command in the root will host both the backend APIs and the Blazor server-side UI.
+4. **Open the app**
 
+   Browse to the HTTPS URL printed in the console (typically `https://localhost:7xxx`). This is a single Blazor Server app — it hosts both the UI and the server-side logic, so there is no separate API to start.
 
+## Project structure
+
+```
+EmployeeManagementSystem1/
+├── Pages/         # Blazor pages: AddEmployee, EmployeesTable, EmployeeDetail, AuditLogs
+├── Components/    # Reusable Blazor components
+├── Services/      # EmployeeService — CRUD + audit log writes
+├── Data/          # DataContext (EF Core DbContext)
+├── Models/        # Employee and audit log entities
+├── Areas/         # Identity UI
+└── Shared/        # Layout and navigation
+```
+
+## Notes
+
+- Identity password requirements are intentionally relaxed for internal use (minimum 5 characters, no complexity rules). Tighten these in `Program.cs` before any public deployment.
+- `appsettings.json` is committed with a local development connection string; use user secrets or environment variables for real credentials.
+
+## License
+
+No license has been specified yet. Consider adding one (MIT is a common choice) if you want others to be able to reuse this code.
